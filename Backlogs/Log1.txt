@@ -1,0 +1,6 @@
+Backlog du premier sprint :
+
+- mise en place de l'affichage de données (arbitraires pour l'instant car nous n'avons pas la totalité de
+  la chaine applicative) sous forme de page web contenant des media-queries, afin de créer un rendu qui 
+  puisse être utilisé par une WebApp et qui soit responsive en suivant les conseils du cours sur le
+  Responsive Design.

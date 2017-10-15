@@ -1,0 +1,5 @@
+Backlog du deuxième sprint :
+
+- mise en place de la récupération des données par les sondes systèmes, dans notre cas les sondes permettant
+  de récupérer l'historique des sms envoyés et reçus par l'appareil sondé via l'accès à la base de données
+  SQLite d'Android, ce qui permet via un curseur de récupérer toutes les informations concernant les sms.
