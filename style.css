@@ -1,0 +1,39 @@
+body
+{
+	font: 400 15px Lato, sans-serif;
+    line-height: 1.8;
+    color: #818181;
+    cursor:default;
+}
+
+.jumbotron { 
+	font-family: Montserrat, sans-serif;
+    background-color: #f4511e; /* Orange */
+    box-shadow: 5px 0px 40px rgba(0,0,0, .2);
+    color: #ffffff;
+}
+
+/* Auto ajust for low resolution */
+@media screen and (max-width: 1000px) {
+    .col-md-4 {
+        text-align: center;
+        margin: 25px 0;
+    }
+}
+
+.glyphicon {
+    font-size: 25px;
+    margin-bottom: 20px;
+    color: #f4511e;
+}
+
+footer
+{
+	margin-top:2%;
+}
+
+.col-md-4
+{
+	background-color: #f2f2f2;
+	padding:5%;
+}

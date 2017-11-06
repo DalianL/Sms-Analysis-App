@@ -1,16 +1,16 @@
 package unice.com.smsanalysis;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
+import android.util.JsonReader;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -18,15 +18,79 @@ public class MainActivity extends Activity {
     public int numberSmsToRead = 4;
     public Hashtable<Integer, ArrayList<String>> matrice = new Hashtable<Integer, ArrayList<String>>();
 
+    /*
+    *   Private class HttpAsyncTask to do network things in background
+    *   and set the content of the view.
+     */
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            return testRestHttp(urls);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(getBaseContext(), "Data received!", Toast.LENGTH_LONG).show();
+            textView.setText(textView.getText() + "\n\nRestHttp tests :\n" + result);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.SMS);
+        // call AsynTask to perform network operation on separate thread
+        new HttpAsyncTask().execute("https://www.e-meta.fr/testjson.php", "https://www.e-meta.fr/test.json");
         getSMSDetails();
-
     }
 
+    // Test our class Rest
+    public String testRestHttp(String... urls) {
+                // url[0] = url to test send
+                // url[1] = url to test receive
+                String urlSend = urls[0];
+                String urlReceive = urls[1];
+
+                // REST HTTP SENDER TO TEST SENDING DATA
+                RestHttp sender = new RestHttp(urlSend);
+                int result = sender.sendPostData("ok");
+                Log.d("Result", Integer.toString(result));
+
+                // REST HTTP RECEIVER TO TEST RECEIVED DATA
+                RestHttp receiver = new RestHttp(urlReceive);
+                JsonReader jsonReader = receiver.getData();
+                // If the jsonReader is not null
+                if(jsonReader != null) {
+                    try {
+
+                        jsonReader.beginObject();
+                        while (jsonReader.hasNext()) {
+                            String name = jsonReader.nextName();
+                            if (name.equals("test")) {
+                                String text = jsonReader.nextString();
+                                Log.d("test", text);
+                                return text;
+                            } else {
+                                jsonReader.skipValue();
+                            }
+                        }
+                        jsonReader.endObject();
+
+                    } catch (java.io.IOException e)
+                    {
+                        Log.e("error", "io error");
+                    }
+                }
+                else
+                {
+                    Log.e("ResultReceive", "error");
+                }
+                return "false";
+            }
+
+    // Get details from SMS
     private void getSMSDetails() {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Sms Analysis and creating matrix :");
