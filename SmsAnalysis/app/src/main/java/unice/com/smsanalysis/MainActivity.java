@@ -1,6 +1,8 @@
 package unice.com.smsanalysis;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -11,12 +13,21 @@ import android.util.JsonReader;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.microsoft.windowsazure.mobileservices.*;
+import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 
 public class MainActivity extends Activity {
 
     TextView textView;
+    public String postContent;
     public int numberSmsToRead = 4;
     public Hashtable<Integer, ArrayList<String>> matrice = new Hashtable<Integer, ArrayList<String>>();
+    private MobileServiceClient mClient;
+    public class SmsTable {
+        public String id;
+        public String Text;
+    }
 
     /*
     *   Private class HttpAsyncTask to do network things in background
@@ -44,6 +55,27 @@ public class MainActivity extends Activity {
         // call AsynTask to perform network operation on separate thread
         new HttpAsyncTask().execute("https://www.e-meta.fr/testjson.php", "https://www.e-meta.fr/test.json");
         getSMSDetails();
+
+        // attempting to connect to azure mobile service
+        try {
+            mClient = new MobileServiceClient("https://smsanalysisapp.azurewebsites.net", this);
+            SmsTable item = new SmsTable();
+            item.Text = postContent;
+            mClient.getTable(SmsTable.class).insert(item, new TableOperationCallback<SmsTable>() {
+                public void onCompleted(SmsTable entity, Exception exception, ServiceFilterResponse response) {
+                    if (exception == null) {
+                        // Insert succeeded
+                        Log.d("insert", "success");
+                    } else {
+                        // Insert failed
+                        Log.d("insert", "fail");
+                    }
+                }
+            });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     // Test our class Rest
@@ -64,7 +96,6 @@ public class MainActivity extends Activity {
                 // If the jsonReader is not null
                 if(jsonReader != null) {
                     try {
-
                         jsonReader.beginObject();
                         while (jsonReader.hasNext()) {
                             String name = jsonReader.nextName();
@@ -78,13 +109,10 @@ public class MainActivity extends Activity {
                         }
                         jsonReader.endObject();
 
-                    } catch (java.io.IOException e)
-                    {
+                    } catch (java.io.IOException e) {
                         Log.e("error", "io error");
                     }
-                }
-                else
-                {
+                } else {
                     Log.e("ResultReceive", "error");
                 }
                 return "false";
@@ -100,18 +128,13 @@ public class MainActivity extends Activity {
         if (cursor.moveToFirst()) {
             // cursor.getCount();
             for (int i = 0; i < this.numberSmsToRead; i++) {
-                String body = cursor.getString(cursor.getColumnIndexOrThrow("body"))
-                        .toString();
-                String number = cursor.getString(cursor.getColumnIndexOrThrow("address"))
-                        .toString();
-                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
-                        .toString();
+                String body = cursor.getString(cursor.getColumnIndexOrThrow("body")).toString();
+                String number = cursor.getString(cursor.getColumnIndexOrThrow("address")).toString();
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date")).toString();
                 Date smsDayTime = new Date(Long.valueOf(date));
-                String type = cursor.getString(cursor.getColumnIndexOrThrow("type"))
-                        .toString();
+                String type = cursor.getString(cursor.getColumnIndexOrThrow("type")).toString();
                 String typeOfSMS = null;
-                switch (Integer.parseInt(type))
-                {
+                switch (Integer.parseInt(type)) {
                     case 1:
                         typeOfSMS = "INBOX";
                         break;
@@ -141,6 +164,7 @@ public class MainActivity extends Activity {
             }
             stringBuffer.append("\n Affichage de la matrice :\n" + matrice.toString());
             textView.setText(stringBuffer);
+            postContent = matrice.toString();
             Log.i("test", matrice.toString());
 
         }
