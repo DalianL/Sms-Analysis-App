@@ -1,0 +1,6 @@
+Backlog du troisième sprint : Envoi des données vers un serveur
+
+-> mise en place de l'envoi de données d'un client Android (smartphone utilisé pour envoyer et recevoir des 
+  sms) vers un serveur via une implémentation de l'API REST en Java. Le protocole permet d'envoyer des données 
+  texte sur un serveur PHP, et la réception des données par le serveur est confirmée en consultant la page web
+  sur le serveur.
