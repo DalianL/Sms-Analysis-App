@@ -1,5 +1,0 @@
-Backlog du quatrième sprint : Réception des données depuis un serveur
-
--> mise en place de l'envoi de données depuis le serveur PHP vers un client Android pour visualisation 
-  des données présentes sur le serveur, en utilisant l'API Rest. Les données envoyées sont au format 
-  Json et sont traduites sous forme de texte lors de l'affichage sur client.

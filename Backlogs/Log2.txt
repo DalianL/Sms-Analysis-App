@@ -1,5 +1,12 @@
-Backlog du deuxième sprint : Récupération des données via les sondes système
+Backlog du deuxième sprint : Mise en place du Cloud
 
--> mise en place de la récupération des données par les sondes systèmes, dans notre cas les sondes permettant
-  de récupérer l'historique des sms envoyés et reçus par l'appareil sondé via l'accès à la base de données
-  SQLite d'Android, ce qui permet via un curseur de récupérer toutes les informations concernant les sms.
+-> mise en place d'éléments de la plateforme cloud Azure pour le projet :
+	- un backend Node.js est établi afin de remplacer le serveur PHP. L'API MobileServices Azure est utilisée 
+	  afin de pouvoir envoyer des données du client Android vers le backend; ces données sont maintenant les 4 
+	  derniers SMS (envoyés et reçus confondus) du client utilisé.
+	- une base de données Easy Tables est établie afin de pouvoir stocker les données envoyées par le client sur 
+	  le serveur de façon rapide. Cette base de données permet de stocker dans des tables NoSQL, pour une clé étant 
+	  l'ID de l'envoi par le client, une valeur étant l'ensemble des informations sur les 4 derniers SMS.
+	- un frontend est établi à partir du site web Responsive mis en place lors du Sprint n°1, en le plaçant sur 
+	  le Cloud d'Azure. Ce frontend permet juste ici de recevoir les données situées le backend et en afficher 
+	  une partie.

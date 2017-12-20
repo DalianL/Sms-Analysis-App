@@ -1,6 +1,13 @@
-Backlog du troisième sprint : Envoi des données vers un serveur
+Backlog du troisième sprint : Traitement et Automatisation sur le Cloud
 
--> mise en place de l'envoi de données d'un client Android (smartphone utilisé pour envoyer et recevoir des 
-  sms) vers un serveur via une implémentation de l'API REST en Java. Le protocole permet d'envoyer des données 
-  texte sur un serveur PHP, et la réception des données par le serveur est confirmée en consultant la page web
-  sur le serveur.
+-> mise en place d'une unité de calcul et de traitement de données sur le Cloud permettant de récupérer la 
+	dernière entrée dans la base de données, d'en extraire les 4 SMS différents envoyés par le client et 
+	d'analyser quel est le numéro le plus fréquent dans ces SMS. Le numéro est ensuite renvoyé à la base de 
+	données dans une autre table que celle utilisée pour le stockage des informations du client, afin d'y 
+	accéder via le frontend pour y afficher le numéro le plus contacté calculé précedemment.
+-> mise en place de l'automatisation des processus sur le Cloud grâce à des vérifications périodiques
+	d'un changement dans les tables : le processus de calcul vérifie si la table contenant les données
+	envoyées par l'application Android a été modifiée afin de lire son contenu si c'est le cas, et le
+	frontend (l'affichage sur la page web) vérifie si la table contenant les données résultantes de 
+	l'algorithme précédent a été mise à jour avec un nouveau résultat à afficher pour pouvoir l'afficher
+	sur la page web sans avoir à recharger la page.

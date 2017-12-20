@@ -1,7 +1,0 @@
-Backlog du sixième sprint : Traitement sur le Cloud
-
--> mise en place d'une unité de calcul et de traitement de données sur le Cloud permettant de récupérer la 
-  dernière entrée dans la base de données, d'en extraire les 4 SMS différents envoyés par le client et 
-  d'analyser quel est le numéro le plus fréquent dans ces SMS. Le numéro est ensuite renvoyé à la base de 
-  données dans une autre table que celle utilisée pour le stockage des informations du client, afin d'y accéder
-  via le frontend pour y afficher le numéro le plus contacté calculé précedemment.

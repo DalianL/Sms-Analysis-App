@@ -1,6 +1,13 @@
-Backlog du premier sprint : Web page responsive
+Backlog du premier sprint : Premier prototype
 
--> mise en place de l'affichage de données (arbitraires pour l'instant car nous n'avons pas la totalité de
-  la chaine applicative) sous forme de page web contenant des media-queries, afin de créer un rendu qui 
-  puisse être utilisé par une WebApp et qui soit responsive en suivant les conseils du cours sur le
-  Responsive Design.
+-> mise en place de la récupération des données par les sondes systèmes, dans notre cas les sondes permettant
+	de récupérer l'historique des sms envoyés et reçus par l'appareil sondé via l'accès à la base de données
+	SQLite d'Android, ce qui permet via un curseur de récupérer toutes les informations concernant les sms.
+-> mise en place de l'envoi de données d'un client Android (smartphone utilisé pour envoyer et recevoir des 
+	sms) vers un serveur via une implémentation de l'API REST en Java. Le protocole permet d'envoyer des données 
+	texte sur un serveur PHP, et la réception des données par le serveur est confirmée en consultant la page web
+	sur le serveur. Pour l'instant seules les informations sur les 4 derniers sms sont envoyées.
+-> mise en place de l'envoi de données depuis le serveur PHP vers un client Android en utilisant l'API Rest. 
+	Les données envoyées sont au format Json et sont converties sous forme de texte pour être affichées.
+-> mise en place d'un rendu responsive en suivant les conseils du cours sur le Responsive Design pour préparer
+	l'envoi des données sur un client à travers un navigateur.
