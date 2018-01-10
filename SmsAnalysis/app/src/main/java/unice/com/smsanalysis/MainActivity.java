@@ -1,14 +1,19 @@
 package unice.com.smsanalysis;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.util.JsonReader;
 import android.util.Log;
 import android.widget.TextView;
@@ -21,7 +26,7 @@ public class MainActivity extends Activity {
 
     TextView textView;
     public String postContent;
-    public int numberSmsToRead = 4;
+    public int numberSmsToRead = 30;
     public Hashtable<Integer, ArrayList<String>> matrice = new Hashtable<Integer, ArrayList<String>>();
     private MobileServiceClient mClient;
     public class SmsTable {
@@ -57,6 +62,8 @@ public class MainActivity extends Activity {
         getSMSDetails();
 
         // attempting to connect to azure mobile service
+
+        /**
         try {
             mClient = new MobileServiceClient("https://smsanalysisapp.azurewebsites.net", this);
             SmsTable item = new SmsTable();
@@ -74,7 +81,7 @@ public class MainActivity extends Activity {
             });
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        }
+        }**/
 
     }
 
@@ -118,6 +125,70 @@ public class MainActivity extends Activity {
                 return "false";
             }
 
+    // get name of the contact by passing the context and the number
+    // In case no contact is associed with the number, return Unknown name.
+    public String getContactName(Context context, String phoneNumber) {
+        ContentResolver cr = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(phoneNumber));
+        Cursor cursor = cr.query(uri,
+                new String[] { ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
+        if (cursor == null) {
+            return "Unknown";
+        }
+        String contactName = "Unknown";
+        if (cursor.moveToFirst()) {
+            contactName = cursor.getString(cursor
+                    .getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        }
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        return contactName;
+    }
+
+    private Date getDate(long timeStamp){
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+            Date netDate = (new Date(timeStamp));
+            return netDate;
+        }
+        catch(Exception ex){
+            return null;
+        }
+    }
+
+    private int getDayOfWeek(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        return dayOfWeek;
+    }
+
+    // ! Week start Sunday in english
+    private int dayOfWeek(int dayValue) {
+        if(dayValue == 1 || dayValue == 7)
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    // ! Week start Sunday in english
+    private int dayOfWeekend(int dayValue) {
+        if(dayValue == 1 || dayValue == 7)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     // Get details from SMS
     private void getSMSDetails() {
         StringBuffer stringBuffer = new StringBuffer();
@@ -127,12 +198,15 @@ public class MainActivity extends Activity {
 
         if (cursor.moveToFirst()) {
             // cursor.getCount();
-            for (int i = 0; i < this.numberSmsToRead; i++) {
+            for (int i = 0; i < numberSmsToRead; i++) {
                 String body = cursor.getString(cursor.getColumnIndexOrThrow("body")).toString();
                 String number = cursor.getString(cursor.getColumnIndexOrThrow("address")).toString();
+                String name = getContactName(this,number).toString();
                 String date = cursor.getString(cursor.getColumnIndexOrThrow("date")).toString();
                 Date smsDayTime = new Date(Long.valueOf(date));
                 String type = cursor.getString(cursor.getColumnIndexOrThrow("type")).toString();
+                int dayWeek = dayOfWeek(getDayOfWeek(smsDayTime));
+                int dayWeekend = dayOfWeekend(getDayOfWeek(smsDayTime));
                 String typeOfSMS = null;
                 switch (Integer.parseInt(type)) {
                     case 1:
@@ -146,17 +220,21 @@ public class MainActivity extends Activity {
                         break;
                 }
 
-                stringBuffer.append("\nPhone Number:--- " + number +
-                        " \nMessage Type:--- " + typeOfSMS +
-                        " \nMessage Date:--- " + smsDayTime);
-                stringBuffer.append("\n----------------------------------");
+                //stringBuffer.append("\nPhone Number:--- " + number +" \nMessage Type:--- " + typeOfSMS +" \nMessage Date:--- " + smsDayTime);
+                // stringBuffer.append("\n----------------------------------");
                 cursor.moveToNext();
 
                 // Add to matrix
                 ArrayList<String> contenu = new ArrayList<String>();
+                contenu.add(name);
                 contenu.add(number);
                 contenu.add(date);
                 contenu.add(type);
+                // if day of week
+                contenu.add(Integer.toString(dayWeek));
+                // if day of weekend
+                contenu.add(Integer.toString(dayWeekend));
+                // type of SMS
                 contenu.add(typeOfSMS);
 
                 matrice.put(i,contenu);
