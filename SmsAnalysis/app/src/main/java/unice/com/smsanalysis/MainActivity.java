@@ -3,13 +3,15 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import java.net.MalformedURLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,8 +21,6 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.microsoft.windowsazure.mobileservices.*;
-import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
-import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 
 public class MainActivity extends Activity {
     TextView textView;
@@ -84,6 +84,8 @@ public class MainActivity extends Activity {
 
     // Get details from SMS
     private void getSMSDetails() {
+        // Sms HashTable
+        Sms sms = new Sms();
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Sms Analysis and creating matrix :");
         Uri uri = Uri.parse("content://sms");
@@ -145,14 +147,18 @@ public class MainActivity extends Activity {
                 contenu.add(Integer.toString(DateControl.isEvening(hourOfDay)));
                 matrice.put(i,contenu);
 
+                sms.addSmsToUser(name, Long.parseLong(date), nbrCaracters);
+
             }
             stringBuffer.append("\n Affichage de la matrice :\n" + matrice.toString());
             textView.setText(stringBuffer);
             postContent = matrice.toString();
             Log.i("Matrice", matrice.toString());
+            Log.i("sms michael", sms.getSmsfromUser("Michael").toString());
         }
         cursor.close();
     }
+
 
     // Test our class Rest
     public String testRestHttp(String... urls) {
