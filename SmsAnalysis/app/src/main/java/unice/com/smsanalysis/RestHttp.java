@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class RestHttp {
             URL githubEndpoint = new URL(this.url);
             // Create connection
             try {
-                HttpsURLConnection myConnection = (HttpsURLConnection) githubEndpoint.openConnection();
+                HttpURLConnection myConnection = (HttpURLConnection) githubEndpoint.openConnection();
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -62,6 +63,35 @@ public class RestHttp {
         return 1;
     }
 
+    public int compute() {
+        // Create URL
+        try {
+            URL urlToReach = new URL(this.url);
+            // Create connection
+            try {
+                HttpURLConnection myConnection = (HttpURLConnection) urlToReach.openConnection();
+
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.d("Response", "OK");
+                    // Close connection
+                    myConnection.disconnect();
+                }
+                else {
+                    // Error handling code goes here
+                    Log.d("Response", "not ok");
+                    return 0;
+                }
+            } catch (java.io.IOException e2) {
+                Log.e("Error", "Incorrect IO.");
+                return 0;
+            }
+        } catch (java.net.MalformedURLException e1) {
+            Log.e("Error", "Incorrect Url.");
+        }
+        return 0;
+    }
+
     public int sendPostData(String data)
     {
         // Create URL
@@ -69,7 +99,7 @@ public class RestHttp {
             URL urlToReach = new URL(this.url);
             // Create connection
             try {
-                HttpsURLConnection myConnection = (HttpsURLConnection) urlToReach.openConnection();
+                HttpURLConnection myConnection = (HttpURLConnection) urlToReach.openConnection();
                 // Send data by POST
                 myConnection.setRequestMethod("POST");
                 // Create the data

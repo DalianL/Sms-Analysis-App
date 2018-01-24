@@ -3,6 +3,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,6 +23,8 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.microsoft.windowsazure.mobileservices.*;
+import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 
 public class MainActivity extends Activity {
     TextView textView;
@@ -60,26 +64,26 @@ public class MainActivity extends Activity {
         new HttpAsyncTask().execute("https://www.e-meta.fr/testjson.php", "https://www.e-meta.fr/test.json");
         getSMSDetails();
         // attempting to connect to azure mobile service
-        /**
+
         try {
             mClient = new MobileServiceClient("https://smsanalysisapp.azurewebsites.net", this);
             SmsTable item = new SmsTable();
+            item.id = "3ea8aebb-27ab-44e4-88c7-0af7dd3dbfa5";
             item.Text = postContent;
-            mClient.getTable(SmsTable.class).insert(item, new TableOperationCallback<SmsTable>() {
+            mClient.getTable(SmsTable.class).update(item, new TableOperationCallback<SmsTable>() {
                 public void onCompleted(SmsTable entity, Exception exception, ServiceFilterResponse response) {
                     if (exception == null) {
                         // Insert succeeded
-                        Log.d("insert", "success");
+                        Log.d("update", "success");
                     } else {
                         // Insert failed
-                        Log.d("insert", "fail");
+                        Log.d("update", "fail");
                     }
                 }
             });
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-         **/
     }
 
     // Get details from SMS

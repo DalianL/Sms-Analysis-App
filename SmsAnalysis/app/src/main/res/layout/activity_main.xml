@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context="unice.com.smsanalysis.MainActivity">
 
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="fill_parent"
+        android:layout_height="350dp"
+        android:scrollbars="none"
+        />
+
     <TextView
         android:layout_width="328dp"
         android:layout_height="482dp"
