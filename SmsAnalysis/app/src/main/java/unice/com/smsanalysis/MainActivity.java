@@ -29,14 +29,37 @@ import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 public class MainActivity extends Activity {
     TextView textView;
     public String postContent;
-    public int numberSmsToRead = 100;
+    public int numberSmsToRead = 1000;
+    // Time in android is UNIX time in milliseconds not timestamp with seconds.
+    public long oneMinute = 60 * 1000L;
+    public long twoMinutes = oneMinute * 2;
+    public long fiveMinutes = oneMinute * 5;
+    public long tenMinutes = 600 * 1000L;
+    public long twentyMinutes = tenMinutes * 2;
+    public long thirtyMinutes = tenMinutes * 3;
+    public long fourtyMinutes = tenMinutes * 4;
+    public long fiftyMinutes = tenMinutes * 5;
+    public long oneHour = tenMinutes * 6;
+    public long oneHourAndHalf = tenMinutes * 9;
+    public long twoHour = oneHour * 2;
+    public long threeHour = oneHour * 3;
+    public long fourHour = oneHour * 4;
+    public long fiveHour = oneHour * 5;
+    public long sixHour = oneHour * 6;
+    public long twelveHour = oneHour * 12;
+    public long oneDay = twelveHour * 2;
+    public long twoDay = oneDay * 2;
+    public long threeDay = oneDay * 3;
+    public long fourDay = oneDay * 4;
+    public long fiveDay = oneDay * 5;
+    public long sixDay = oneDay * 6;
+    public long oneWeek = oneDay * 7;
     public Hashtable<Integer, ArrayList<String>> matrice = new Hashtable<Integer, ArrayList<String>>();
     private MobileServiceClient mClient;
     public class SmsTable {
         public String id;
         public String Text;
     }
-
     /*
     *   Private class HttpAsyncTask to do network things in background
     *   and set the content of the view.
@@ -64,7 +87,6 @@ public class MainActivity extends Activity {
         new HttpAsyncTask().execute("https://www.e-meta.fr/testjson.php", "https://www.e-meta.fr/test.json");
         getSMSDetails();
         // attempting to connect to azure mobile service
-
         try {
             mClient = new MobileServiceClient("https://smsanalysisapp.azurewebsites.net", this);
             SmsTable item = new SmsTable();
@@ -88,13 +110,14 @@ public class MainActivity extends Activity {
 
     // Get details from SMS
     private void getSMSDetails() {
+        long startTime = System.currentTimeMillis();
         // Sms HashTable
         Sms sms = new Sms();
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Sms Analysis and creating matrix :");
         Uri uri = Uri.parse("content://sms");
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-
+        // Move with cursor
         if (cursor.moveToFirst()) {
             // cursor.getCount();
             for (int i = 0; i < numberSmsToRead; i++) {
@@ -131,8 +154,11 @@ public class MainActivity extends Activity {
                 ArrayList<String> contenu = new ArrayList<String>();
                 contenu.add(name);
                 contenu.add(number);
+                // Date in UNIX FORMAT (milliseconds)
                 contenu.add(date);
-                contenu.add(type);
+                // Type of SMS
+                contenu.add(typeOfSMS);
+                // PART DAY/HOUR IN A NICHE
                 // if day of week
                 contenu.add(Integer.toString(dayWeek));
                 // if day of weekend
@@ -149,20 +175,68 @@ public class MainActivity extends Activity {
                 contenu.add(Integer.toString(DateControl.isAfternoon(hourOfDay)));
                 // hour 19h - 23h
                 contenu.add(Integer.toString(DateControl.isEvening(hourOfDay)));
-                matrice.put(i,contenu);
-
+                // Add sms to user in hashmap sms
                 sms.addSmsToUser(name, Long.parseLong(date), nbrCaracters);
-
+                // PART FILTER AND CACULATE AVERAGE AND NUMBER OF SMS WITH A DISTANCE OF TIME
+                // Filter (1 minute), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+oneMinute,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (2 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+twoMinutes,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (5 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fiveMinutes,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (10 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+tenMinutes,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (20 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+twentyMinutes,Long.parseLong(date), name);  contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (30 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+thirtyMinutes,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (40 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fourtyMinutes,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (50 minutes), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fiftyMinutes,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (1 hour), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+oneHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (1 hour and a half), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+oneHourAndHalf,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (2 hours), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+twoHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (3 hours), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+threeHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (4 hours), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fourHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (5 hours), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fiveHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (6 hours), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+sixHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (12 hours), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+twelveHour,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (1 day), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+oneDay,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (2 day), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+twoDay,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (3 day), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+threeDay,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (4 day), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fourDay,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (5 day), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+fiveDay,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (6 day), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+sixDay,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Filter (1 week), calculate the average of words and the number of messages.
+                sms.filterSmsByTime(Long.parseLong(date)+oneWeek,Long.parseLong(date), name); contenu.add(sms.getCountSms()+""); contenu.add(sms.getAverageWords()+"");
+                // Add sms vector to matrix
+                matrice.put(i,contenu);
             }
             stringBuffer.append("\n Affichage de la matrice :\n" + matrice.toString());
             textView.setText(stringBuffer);
             postContent = matrice.toString();
             Log.i("Matrice", matrice.toString());
-            Log.i("sms michael", sms.getSmsfromUser("Michael").toString());
+            long endTime   = System.currentTimeMillis();
+            long totalTime = endTime - startTime;
+            Log.d("total time :", totalTime+"");
         }
         cursor.close();
     }
-
 
     // Test our class Rest
     public String testRestHttp(String... urls) {
@@ -170,11 +244,9 @@ public class MainActivity extends Activity {
         // url[1] = url to test receive
         String urlSend = urls[0];
         String urlReceive = urls[1];
-
         // REST HTTP SENDER TO TEST SENDING DATA
         RestHttp sender = new RestHttp(urlSend);
         int result = sender.sendPostData("ok");
-
         // REST HTTP RECEIVER TO TEST RECEIVED DATA
         RestHttp receiver = new RestHttp(urlReceive);
         JsonReader jsonReader = receiver.getData();
