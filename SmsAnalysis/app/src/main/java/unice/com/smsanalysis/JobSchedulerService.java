@@ -1,108 +1,109 @@
 package unice.com.smsanalysis;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Bundle;
-
+import android.app.job.JobParameters;
+import android.app.job.JobService;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.widget.Toast;
+import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
-import android.app.Activity;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.ContactsContract;
-import android.util.JsonReader;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.microsoft.windowsazure.mobileservices.*;
-import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
-import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
+public class JobSchedulerService extends JobService {
+    public String postContent;
+    public int numberSmsToRead = 1000;
+    // Time in android is UNIX time in milliseconds not timestamp with seconds.
+    public long oneMinute = 60 * 1000L;
+    public long twoMinutes = oneMinute * 2;
+    public long fiveMinutes = oneMinute * 5;
+    public long tenMinutes = 600 * 1000L;
+    public long twentyMinutes = tenMinutes * 2;
+    public long thirtyMinutes = tenMinutes * 3;
+    public long fourtyMinutes = tenMinutes * 4;
+    public long fiftyMinutes = tenMinutes * 5;
+    public long oneHour = tenMinutes * 6;
+    public long oneHourAndHalf = tenMinutes * 9;
+    public long twoHour = oneHour * 2;
+    public long threeHour = oneHour * 3;
+    public long fourHour = oneHour * 4;
+    public long fiveHour = oneHour * 5;
+    public long sixHour = oneHour * 6;
+    public long twelveHour = oneHour * 12;
+    public long oneDay = twelveHour * 2;
+    public long twoDay = oneDay * 2;
+    public long threeDay = oneDay * 3;
+    public long fourDay = oneDay * 4;
+    public long fiveDay = oneDay * 5;
+    public long sixDay = oneDay * 6;
+    public long oneWeek = oneDay * 7;
+    public Hashtable<Integer, ArrayList<String>> matrice = new Hashtable<Integer, ArrayList<String>>();
+    private MobileServiceClient mClient;
+    public class SmsTable {
+        public String id;
+        public String Text;
+    }
 
-public class MainActivity extends Activity {
-    TextView textView;
-    int anHour = 60000*60;
-    private JobScheduler mJobScheduler;
-    private Button mGoWebsiteButton;
-    private Button mCancelAllJobsButton;
-
-    /**
-    *   Private class HttpAsyncTask to do network things in background
-    *   and set the content of the view.
-    */
-    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+    // HANDLER
+    private Handler mJobHandler = new Handler(new Handler.Callback() {
         @Override
-        protected String doInBackground(String... urls) {
+        public boolean handleMessage(Message msg) {
+            // Get details from sms
+            getSmsDetails();
+            // Update azure databse with informations
+            sendSmsDetails();
+            // Show message for the user when the update is done
+            Toast.makeText(getApplicationContext(), "Sms database updated successfully", Toast.LENGTH_SHORT).show();
+            jobFinished((JobParameters) msg.obj, false);
+            return true;
+        }
+    });
 
-            return testRestHttp(urls);
-        }
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String result) {
-            Toast.makeText(getBaseContext(), "Data received!", Toast.LENGTH_LONG).show();
-            textView.setText(textView.getText() + "\n\nRestHttp tests :\n" + result);
-        }
+    // START JOB
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        mJobHandler.sendMessage(Message.obtain(mJobHandler, 1, params));
+        return true;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        textView = (TextView) findViewById(R.id.SMS);
-        mJobScheduler = (JobScheduler) getSystemService( Context.JOB_SCHEDULER_SERVICE );
-        mGoWebsiteButton = (Button) findViewById( R.id.goWebsite );
-        mCancelAllJobsButton = (Button) findViewById( R.id.stopService );
-
-        // call AsynTask to perform network operation on separate thread
-        //new HttpAsyncTask().execute("https://www.e-meta.fr/testjson.php", "https://www.e-meta.fr/test.json");
-        //getSMSDetails();
-
-        // New builder for the service
-        JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(getPackageName(), JobSchedulerService.class.getName()));
-        // Doit être connecté au réseau
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        // Only with charging.
-        builder.setRequiresCharging(true);
-        // Each hour.
-        builder.setPeriodic(anHour);
-        // Stay after reboot
-        builder.setPersisted(true);
-
-        // Run the job
-        if( mJobScheduler.schedule( builder.build() ) <= 0 ) {
-            //If something goes wrong
-            Log.d("error job", "job goes wrong");
-        }
-
-        textView.setText("SMS ANALYSIS APP");
-        textView.setTextColor(Color.RED);
-
-        // Click to stop the job service.
-        mCancelAllJobsButton.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View v ) {
-                mJobScheduler.cancelAll();
-                Toast.makeText(getApplicationContext(), "Service stopped", Toast.LENGTH_SHORT).show();
-            }
-        });
+    public boolean onStopJob(JobParameters params) {
+        mJobHandler.removeMessages(1);
+        return false;
     }
 
-    /**
+    // Send details from SMS to azure database
+    private void sendSmsDetails() {
+        // attempting to connect to azure mobile service
+        try {
+            mClient = new MobileServiceClient("https://smsanalysisapp.azurewebsites.net", this);
+            SmsTable item = new SmsTable();
+            item.id = "3ea8aebb-27ab-44e4-88c7-0af7dd3dbfa5";
+            item.Text = postContent;
+            mClient.getTable(SmsTable.class).update(item, new TableOperationCallback<SmsTable>() {
+                public void onCompleted(SmsTable entity, Exception exception, ServiceFilterResponse response) {
+                    if (exception == null) {
+                        // Insert succeeded
+                        Log.d("update", "success");
+                    } else {
+                        // Insert failed
+                        Log.d("update", "fail" + exception.toString());
+                    }
+                }
+            });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Get details from SMS
-    private void getSMSDetails() {
+    private void getSmsDetails() {
         long startTime = System.currentTimeMillis();
         // Sms HashTable
         Sms sms = new Sms();
@@ -221,7 +222,6 @@ public class MainActivity extends Activity {
                 matrice.put(i,contenu);
             }
             stringBuffer.append("\n Affichage de la matrice :\n" + matrice.toString());
-            textView.setText(stringBuffer);
             postContent = matrice.toString();
             Log.i("Matrice", matrice.toString());
             long endTime   = System.currentTimeMillis();
@@ -229,42 +229,5 @@ public class MainActivity extends Activity {
             Log.d("total time :", totalTime+"");
         }
         cursor.close();
-    }
-     **/
-
-    // Test our class Rest
-    public String testRestHttp(String... urls) {
-        // url[0] = url to test send
-        // url[1] = url to test receive
-        String urlSend = urls[0];
-        String urlReceive = urls[1];
-        // REST HTTP SENDER TO TEST SENDING DATA
-        RestHttp sender = new RestHttp(urlSend);
-        int result = sender.sendPostData("ok");
-        // REST HTTP RECEIVER TO TEST RECEIVED DATA
-        RestHttp receiver = new RestHttp(urlReceive);
-        JsonReader jsonReader = receiver.getData();
-        // If the jsonReader is not null
-        if(jsonReader != null) {
-            try {
-                jsonReader.beginObject();
-                while (jsonReader.hasNext()) {
-                    String name = jsonReader.nextName();
-                    if (name.equals("test")) {
-                        String text = jsonReader.nextString();
-                        return text;
-                    } else {
-                        jsonReader.skipValue();
-                    }
-                }
-                jsonReader.endObject();
-
-            } catch (java.io.IOException e) {
-                Log.e("error", "io error");
-            }
-        } else {
-            Log.e("ResultReceive", "error");
-        }
-        return "false";
     }
 }

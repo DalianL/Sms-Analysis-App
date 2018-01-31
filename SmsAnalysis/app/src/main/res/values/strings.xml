@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SmsAnalysis</string>
+    <string name="appNameText">Sms ANALYSIS APP</string>
+    <string name="goWebsiteButton">Go Website</string>
+    <string name="goWebsiteText">Go to the website to see data analysis :</string>
+    <string name="stopServiceText">Stop the service that update your data :</string>
+    <string name="stopServiceButton">Stop service</string>
 </resources>
