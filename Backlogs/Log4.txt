@@ -1,8 +1,8 @@
 Backlog du quatrième sprint : Création du vecteur complet pour le Machine learning
 
 -> mise en place du vecteur qui permettra d'avoir toutes les informations nécessaires pour effectuer le
-	Machine learning. A la place des 4 derniers SMS et des informations basiques sur ces SMS, sont envoyés
-	les 1000 derniers SMS avec non seulement les informations basiques mais aussi les moyennes sur le
+	Machine learning. A la place des informations basiques sur les 4 derniers SMS, sont envoyés
+	non seulement les informations basiques sur les 1000 derniers SMS mais aussi les moyennes sur le
 	nombre de SMS envoyés/reçus et le nombre de caractères dans un SMS sur les durées suivantes :
 	1 min, 2 mins, 5 mins, 10 mins, 20 mins, 30 mins, 40 mins, 50 mins, 1h, 1h30, 2h, 3h, 4h, 5h, 6h, 12h, 
 	1 jour, 2 jours, 3 jours, 4 jours, 5 jours, 6 jours, 1 semaine afin d'avoir un grand nombre d'informations

@@ -1,1 +1,16 @@
 Backlog du sixième sprint : Machine learning complet et automatisation
+
+-> mise en place d'une utilisation plus poussée de l'algorithme Random Forest pour obtenir la classification 
+	selon un ensemble d'apprentissage plus précis (c'est à dire en utilisant plusieurs colonnes de la matrice
+	pertinentes par rapport au choix de la classification, par exemple les moyennes en nombre de SMS et en 
+	nombre de mots pendant la dernière heure ou les dernières 6 heures) et en affinant les paramètres
+	d'utilisation de l'algorithme afin d'obtenir des résultats plus stables et présentables par le frontend.
+	Le résultat est alors les trois numéros les plus contactés avec leur pourcentage de SMS type chat (envois 
+	courts et fréquents) ou type mail (envois long et plus rares), qui sont envoyés sur le frontend qui
+	va l'afficher lorsque nécessaire.
+-> mise en place de l'automatisation de l'envoi du vecteur par le client Android : afin de non seulement
+	envoyer les données des sondes sur l'historique des SMS sur des périodes régulières mais aussi de
+	gérer la gestion de la batterie et les connexions intermittentes, a été mis en place un service 
+	permettant d'automatiser et de contrôler l'envoi du vecteur de telle sorte qu'il soit toujours envoié 
+	à des périodes de temps assez larges pour ne pas utiliser trop de batterie et lorsque les conditions
+	réseau sont remplies.

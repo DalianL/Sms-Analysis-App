@@ -1,1 +1,14 @@
 Backlog du prototype n°1 :
+
+Le premier prototype établit principalement l'architecture complète du projet pour permettre de se
+concentrer sur les fonctionnalités ensuite. Ce prototype est constitué de la façon suivante :
+- Un client Android extrait lors de l'ouverture de notre application l'historique de ses SMS, 
+	sélectionne des données sur les 4 derniers SMS et envoie ces données vers le Cloud;
+- Le backend sur le Cloud reçoit ces données qui seront stockées sous un format JSON dans la table 
+	d'une BDD sur le Cloud réservée aux informations sur ces SMS
+- Un algorithme sur le Cloud lit les données de la table des SMS afin d'en extraire le nom du contact 
+	qui possède le numéro le plus contacté, qui sera envoyé sur la table d'une BDD sur le Cloud 
+	réservée aux résultats de l'analyse
+- Lorsque le frontend est ouvert (une page web qui accède à une URL sur le Cloud), un script est 
+	déclenché pour lire la donnée présente dans la table des résultats afin de l'afficher dans
+	la page principale.
