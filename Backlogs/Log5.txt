@@ -1,0 +1,8 @@
+Backlog du cinquième sprint : Machine learning basique
+
+-> mise en place d'un algorithme de Machine learning basique à partir de l'implémentation en JS (entre 
+	autres) par Andrej Karpathy de l'algorithme de classification Random Forest. Dans un premier temps
+	les données du vecteur sont seulement traitées en fonction du nombre de caractères afin de vérifier
+	la validité du modèle et la cohérence des résultats par rapport a l'ensemble d'entraintement de cet
+	algorithme supervisé. Les données résultants ne sont pas encore transmises vers le frontend, et 
+	l'algorithme s'applique sur tous les SMS sans discrimination.
