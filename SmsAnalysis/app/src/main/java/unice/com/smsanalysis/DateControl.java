@@ -68,7 +68,7 @@ public class DateControl {
     }
 
     public static int isMidday(int hour) {
-        if(hour >= 11 && hour <= 15)
+        if(hour >= 11 && hour <= 14)
         {
             return 1;
         }

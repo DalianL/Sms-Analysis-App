@@ -114,6 +114,10 @@ public class JobSchedulerService extends JobService {
         // Move with cursor
         if (cursor.moveToFirst()) {
             // cursor.getCount();
+            // If we haven't enough sms in database
+            if(cursor.getCount() < numberSmsToRead) {
+                numberSmsToRead = cursor.getCount();
+            }
             for (int i = 0; i < numberSmsToRead; i++) {
                 String body = cursor.getString(cursor.getColumnIndexOrThrow("body")).toString();
                 int nbrCaracters = body.length();
